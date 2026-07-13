@@ -25,7 +25,7 @@
 
   // Active nav link on scroll
   const navLinkEls = document.querySelectorAll('[data-nav-link]');
-  const trackedSections = ['about','work','skills','learning','contact']
+  const trackedSections = ['about','work','skills','learning','certificates','contact']
     .map(id => document.getElementById(id))
     .filter(Boolean);
   const spy = new IntersectionObserver((entries) => {
