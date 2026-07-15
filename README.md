@@ -2,8 +2,6 @@
 
 Personal portfolio site. Built with plain HTML, CSS, and JavaScript — no frameworks, no build step.
 
-**Live site:** [safakaware.dev](https://safakaware.dev) *(update once deployed)*
-
 ## Structure
 
 ```
