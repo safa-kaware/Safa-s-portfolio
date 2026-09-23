@@ -1,0 +1,982 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="robots" content="noindex, nofollow">
+<title>Portfolio Admin — Safa Kaware</title>
+<style>
+  :root{
+    --bg: #0d1210;
+    --panel: #141b18;
+    --panel-2: #1a2320;
+    --line: rgba(233,237,225,0.10);
+    --ink: #e9ede1;
+    --ink-dim: #9aa79c;
+    --forest: #4d8a6a;
+    --forest-bright: #6fd39e;
+    --plum: #c76b85;
+    --gold: #d9ac4c;
+    --danger: #d9704c;
+    --mono: 'IBM Plex Mono', 'SFMono-Regular', Consolas, monospace;
+    --sans: 'Inter', -apple-system, sans-serif;
+  }
+  *{ box-sizing:border-box; }
+  html,body{ margin:0; padding:0; }
+  body{
+    background: var(--bg);
+    color: var(--ink);
+    font-family: var(--sans);
+    min-height:100vh;
+  }
+  a{ color:inherit; }
+  ::selection{ background: var(--forest); color:#0d1210; }
+
+  /* ---- Gate screen ---- */
+  #gate{
+    min-height:100vh; display:flex; align-items:center; justify-content:center;
+    flex-direction:column; gap:18px; padding:24px;
+    background:
+      radial-gradient(circle at 20% 20%, rgba(77,138,106,0.14), transparent 45%),
+      radial-gradient(circle at 80% 70%, rgba(199,107,133,0.10), transparent 45%),
+      var(--bg);
+  }
+  #gate .mark{ font-family: var(--mono); font-size:0.78rem; letter-spacing:0.2em; text-transform:uppercase; color: var(--forest-bright); }
+  #gate h1{ font-size:1.5rem; margin:0; font-weight:600; }
+  #gate form{ display:flex; gap:10px; flex-wrap:wrap; justify-content:center; }
+  #gate input[type="password"]{
+    background: var(--panel); border:1px solid var(--line); color:var(--ink);
+    padding:12px 14px; border-radius:8px; font-family:var(--mono); font-size:0.95rem;
+    min-width:240px; outline:none;
+  }
+  #gate input[type="password"]:focus{ border-color: var(--forest-bright); }
+  #gate button{
+    background: var(--forest-bright); color:#0d1210; border:none; padding:12px 20px;
+    border-radius:8px; font-weight:600; cursor:pointer; font-family:var(--sans);
+  }
+  #gate button:hover{ filter:brightness(1.08); }
+  #gate .err{ color: var(--danger); font-size:0.85rem; font-family:var(--mono); min-height:1.2em; }
+  #gate .note{ max-width:440px; text-align:center; font-size:0.82rem; color:var(--ink-dim); line-height:1.6; }
+  #gate .note code{ background:var(--panel-2); padding:1px 6px; border-radius:4px; font-family:var(--mono); }
+
+  /* ---- App shell ---- */
+  #app{ display:none; min-height:100vh; }
+  #app.visible{ display:flex; }
+
+  .sidebar{
+    width:220px; flex-shrink:0; background:var(--panel); border-right:1px solid var(--line);
+    padding:22px 14px; display:flex; flex-direction:column; gap:4px;
+  }
+  .sidebar .brand{ font-family:var(--mono); font-size:0.72rem; letter-spacing:0.14em; text-transform:uppercase; color:var(--forest-bright); padding:0 10px 18px; }
+  .sidebar button.tab{
+    background:none; border:none; color:var(--ink-dim); text-align:left; padding:11px 12px;
+    border-radius:8px; cursor:pointer; font-size:0.92rem; font-family:var(--sans); display:flex; align-items:center; gap:10px;
+  }
+  .sidebar button.tab:hover{ background:var(--panel-2); color:var(--ink); }
+  .sidebar button.tab.active{ background:var(--panel-2); color:var(--forest-bright); font-weight:600; }
+  .sidebar .spacer{ flex:1; }
+  .sidebar .lock-btn{
+    background:none; border:1px solid var(--line); color:var(--ink-dim); padding:9px 12px; border-radius:8px;
+    cursor:pointer; font-size:0.82rem; font-family:var(--sans);
+  }
+  .sidebar .lock-btn:hover{ border-color:var(--danger); color:var(--danger); }
+
+  .main{ flex:1; min-width:0; padding:32px 40px 80px; max-width:920px; }
+  .main h2{ font-size:1.5rem; margin:0 0 4px; }
+  .main .sub{ color:var(--ink-dim); font-size:0.92rem; margin:0 0 26px; }
+
+  .toast{
+    position:fixed; top:20px; right:20px; background:var(--forest-bright); color:#0d1210;
+    padding:12px 18px; border-radius:8px; font-weight:600; font-size:0.88rem;
+    transform: translateY(-12px); opacity:0; transition: all 0.25s ease; pointer-events:none; z-index:50;
+  }
+  .toast.show{ transform: translateY(0); opacity:1; }
+
+  .card{
+    background:var(--panel); border:1px solid var(--line); border-radius:12px;
+    padding:18px 20px; margin-bottom:14px;
+  }
+  .card-row{ display:flex; justify-content:space-between; gap:16px; align-items:flex-start; }
+  .card-row h3{ margin:0 0 4px; font-size:1.02rem; }
+  .card-row .meta{ color:var(--ink-dim); font-size:0.82rem; font-family:var(--mono); }
+  .card-actions{ display:flex; gap:8px; flex-shrink:0; }
+  .icon-btn{
+    background:var(--panel-2); border:1px solid var(--line); color:var(--ink-dim);
+    width:32px; height:32px; border-radius:7px; cursor:pointer; display:flex; align-items:center; justify-content:center;
+  }
+  .icon-btn:hover{ color:var(--ink); border-color: var(--forest-bright); }
+  .icon-btn.danger:hover{ color:var(--danger); border-color:var(--danger); }
+  .chip-list{ display:flex; flex-wrap:wrap; gap:6px; margin-top:10px; }
+  .chip-list span{ background:var(--panel-2); border:1px solid var(--line); padding:3px 10px; border-radius:999px; font-size:0.78rem; font-family:var(--mono); color:var(--ink-dim); }
+
+  .empty{ color:var(--ink-dim); font-size:0.88rem; padding:22px; text-align:center; border:1px dashed var(--line); border-radius:12px; }
+
+  form.editor{ background:var(--panel-2); border:1px solid var(--line); border-radius:12px; padding:20px; margin-bottom:22px; }
+  form.editor h4{ margin:0 0 14px; font-size:0.85rem; text-transform:uppercase; letter-spacing:0.08em; color:var(--forest-bright); font-family:var(--mono); }
+  .field-row{ display:flex; gap:12px; flex-wrap:wrap; margin-bottom:12px; }
+  .field{ flex:1; min-width:180px; display:flex; flex-direction:column; gap:6px; }
+  .field label{ font-size:0.78rem; color:var(--ink-dim); }
+  .field input[type="text"], .field input[type="url"], .field textarea, .field select{
+    background:var(--panel); border:1px solid var(--line); color:var(--ink); padding:10px 11px;
+    border-radius:7px; font-family:var(--sans); font-size:0.92rem; outline:none; width:100%;
+  }
+  .field input:focus, .field textarea:focus, .field select:focus{ border-color:var(--forest-bright); }
+  .field textarea{ resize:vertical; min-height:64px; font-family:var(--sans); }
+  .field-hint{ font-size:0.74rem; color:var(--ink-dim); }
+  .radio-row{ display:flex; gap:16px; font-size:0.85rem; color:var(--ink-dim); }
+  .radio-row label{ display:flex; align-items:center; gap:6px; cursor:pointer; }
+  .form-actions{ display:flex; gap:10px; margin-top:6px; }
+  .btn{ border:none; padding:10px 18px; border-radius:7px; font-weight:600; cursor:pointer; font-size:0.88rem; font-family:var(--sans); }
+  .btn-primary{ background:var(--forest-bright); color:#0d1210; }
+  .btn-primary:hover{ filter:brightness(1.08); }
+  .btn-ghost{ background:none; border:1px solid var(--line); color:var(--ink-dim); }
+  .btn-ghost:hover{ color:var(--ink); border-color:var(--ink-dim); }
+  .btn-add{ background:var(--panel-2); border:1px dashed var(--forest-bright); color:var(--forest-bright); width:100%; padding:12px; border-radius:10px; cursor:pointer; font-family:var(--sans); font-weight:600; margin-bottom:20px; }
+  .btn-add:hover{ background:rgba(111,211,158,0.08); }
+
+  .group-title-row{ display:flex; justify-content:space-between; align-items:center; margin:26px 0 10px; }
+  .group-title-row h3{ font-family:var(--mono); font-size:0.78rem; text-transform:uppercase; letter-spacing:0.1em; color:var(--ink-dim); margin:0; }
+
+  .export-box{ background:var(--panel); border:1px solid var(--line); border-radius:12px; padding:24px; }
+  .export-box p{ color:var(--ink-dim); font-size:0.9rem; line-height:1.7; }
+  .export-box ol{ color:var(--ink-dim); font-size:0.9rem; line-height:1.8; padding-left:20px; }
+  .export-box code{ background:var(--panel-2); padding:1px 6px; border-radius:4px; font-family:var(--mono); font-size:0.85em; color:var(--ink); }
+  .warn-box{ background:rgba(217,112,76,0.1); border:1px solid rgba(217,112,76,0.35); color:#e8b39f; border-radius:10px; padding:14px 16px; font-size:0.85rem; line-height:1.6; margin-bottom:20px; }
+</style>
+</head>
+<body>
+
+<div id="gate">
+  <span class="mark">Private &middot; Admin only</span>
+  <h1 id="gateTitle">Enter password</h1>
+  <form id="gateForm">
+    <input type="password" id="gatePassword" placeholder="Password" autocomplete="current-password" autofocus>
+    <button type="submit" id="gateSubmit">Unlock</button>
+  </form>
+  <div class="err" id="gateError"></div>
+  <p class="note" id="gateNote">This edits your portfolio content. Keep this file on your own computer — don't upload <code>admin.html</code> to your live site.</p>
+</div>
+
+<div id="app">
+  <div id="storageWarning" style="display:none; position:fixed; top:0; left:0; right:0; background:#3a2416; color:#f0c9a0; font-family:var(--mono); font-size:0.8rem; text-align:center; padding:8px; z-index:60; border-bottom:1px solid rgba(240,201,160,0.3);">
+    This browser/preview is blocking local storage — your edits won't be saved after you close this. Download <code>admin.html</code> and open it directly in your browser (double-click the file) for changes to persist.
+  </div>
+  <aside class="sidebar">
+    <div class="brand">Portfolio Admin</div>
+    <button class="tab active" data-tab="projects">Projects</button>
+    <button class="tab" data-tab="skills">Skills</button>
+    <button class="tab" data-tab="certificates">Certificates</button>
+    <button class="tab" data-tab="learning">Learning</button>
+    <button class="tab" data-tab="export">Export site</button>
+    <div class="spacer"></div>
+    <button class="lock-btn" id="lockBtn">Lock &amp; sign out</button>
+  </aside>
+  <main class="main" id="main"></main>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+const INDEX_TEMPLATE = "<!DOCTYPE html>\n<html lang=\"en\">\n<head>\n<meta charset=\"UTF-8\">\n<meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\">\n<title>Safa Kaware \u2014 AI &amp; Full-Stack Software Engineer Portfolio</title>\n<meta name=\"description\" content=\"I'm Safa Kaware, a Computer Science (AI &amp; ML) engineer from Chiplun, Maharashtra, building full-stack platforms and machine learning systems \u2014 from predictive dropout models to generative AI cooking apps.\">\n<meta name=\"keywords\" content=\"Safa Kaware, Safa Salim Kaware, AI ML engineer, full stack developer portfolio, Chiplun Maharashtra, Gharda Institute of Technology, machine learning student India, React developer Maharashtra\">\n<meta name=\"author\" content=\"Safa Salim Kaware\">\n<meta name=\"robots\" content=\"index, follow\">\n<link rel=\"canonical\" href=\"https://safakaware.dev/\">\n\n<!-- Open Graph -->\n<meta property=\"og:type\" content=\"website\">\n<meta property=\"og:title\" content=\"Safa Kaware \u2014 AI &amp; Full-Stack Software Engineer\">\n<meta property=\"og:description\" content=\"Computer Science (AI &amp; ML) engineer building full-stack platforms and machine learning systems. Five shipped projects, one growing portfolio.\">\n<meta property=\"og:url\" content=\"https://safakaware.dev/\">\n<meta property=\"og:site_name\" content=\"Safa Kaware\">\n\n<!-- Twitter -->\n<meta name=\"twitter:card\" content=\"summary\">\n<meta name=\"twitter:title\" content=\"Safa Kaware \u2014 AI &amp; Full-Stack Software Engineer\">\n<meta name=\"twitter:description\" content=\"Computer Science (AI &amp; ML) engineer building full-stack platforms and machine learning systems.\">\n\n<!-- Structured data -->\n<script type=\"application/ld+json\">\n{\n  \"@context\": \"https://schema.org\",\n  \"@type\": \"Person\",\n  \"name\": \"Safa Salim Kaware\",\n  \"alternateName\": \"Safa Kaware\",\n  \"jobTitle\": \"AI & Full-Stack Software Engineering Student\",\n  \"email\": \"mailto:safakaware02@gmail.com\",\n  \"address\": {\n    \"@type\": \"PostalAddress\",\n    \"addressLocality\": \"Chiplun, Ratnagiri\",\n    \"addressRegion\": \"Maharashtra\",\n    \"addressCountry\": \"IN\"\n  },\n  \"alumniOf\": {\n    \"@type\": \"CollegeOrUniversity\",\n    \"name\": \"Gharda Institute of Technology, Khed\"\n  },\n  \"sameAs\": [\n    \"https://github.com/safa-kaware\"\n  ],\n  \"url\": \"https://safakaware.dev/\"\n}\n<\/script>\n\n<link rel=\"preconnect\" href=\"https://fonts.googleapis.com\">\n<link rel=\"preconnect\" href=\"https://fonts.gstatic.com\" crossorigin>\n<link href=\"https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,300;9..144,450;9..144,600;9..144,700&family=Inter:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap\" rel=\"stylesheet\">\n\n<link rel=\"stylesheet\" href=\"styles.css\">\n</head>\n<body>\n\n<header>\n  <nav class=\"nav\">\n    <a class=\"brand\" href=\"#top\" aria-label=\"Safa Kaware, home\">\n      <svg viewBox=\"0 0 24 24\" fill=\"none\" aria-hidden=\"true\"><circle cx=\"12\" cy=\"12\" r=\"9\" stroke=\"#33503F\" stroke-width=\"1.6\"/><ellipse cx=\"12\" cy=\"12\" rx=\"9\" ry=\"3.6\" stroke=\"#7B3B4E\" stroke-width=\"1.6\"/><circle cx=\"12\" cy=\"12\" r=\"2.1\" fill=\"#BE8F2E\"/></svg>\n      Safa Kaware\n    </a>\n    <div class=\"nav-links\" id=\"navLinks\">\n      <a href=\"#about\" data-nav-link=\"about\">About</a>\n      <a href=\"#work\" data-nav-link=\"work\">Work</a>\n      <a href=\"#skills\" data-nav-link=\"skills\">Skills</a>\n      <a href=\"#learning\" data-nav-link=\"learning\">Learning</a>\n      <a href=\"#certificates\" data-nav-link=\"certificates\">Certificates</a>\n      <a href=\"#contact\" data-nav-link=\"contact\">Contact</a>\n    </div>\n    <div class=\"nav-actions\">\n      <a class=\"nav-resume\" href=\"Safa_Kaware_Resume.pdf\" download>\n        <svg viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"1.8\" stroke-linecap=\"round\" stroke-linejoin=\"round\" aria-hidden=\"true\"><path d=\"M12 3v12\"/><path d=\"M7 10l5 5 5-5\"/><path d=\"M5 21h14\"/></svg>\n        Resume\n      </a>\n      <a class=\"nav-cta\" href=\"#contact\">Say hello</a>\n      <button class=\"nav-toggle\" id=\"navToggle\" aria-label=\"Open menu\" aria-expanded=\"false\" aria-controls=\"mobileMenu\">\n        <span></span>\n      </button>\n    </div>\n  </nav>\n</header>\n\n<div class=\"mobile-menu\" id=\"mobileMenu\">\n  <nav class=\"mobile-menu-links\">\n    <a href=\"#about\" data-menu-link data-nav-link=\"about\">About</a>\n    <a href=\"#work\" data-menu-link data-nav-link=\"work\">Work</a>\n    <a href=\"#skills\" data-menu-link data-nav-link=\"skills\">Skills</a>\n    <a href=\"#learning\" data-menu-link data-nav-link=\"learning\">Learning</a>\n    <a href=\"#certificates\" data-menu-link data-nav-link=\"certificates\">Certificates</a>\n    <a href=\"#contact\" data-menu-link data-nav-link=\"contact\">Contact</a>\n  </nav>\n  <div class=\"mobile-menu-foot\">\n    <a class=\"btn btn-ghost\" href=\"Safa_Kaware_Resume.pdf\" download data-menu-link>\n      <svg viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"1.8\" stroke-linecap=\"round\" stroke-linejoin=\"round\" aria-hidden=\"true\"><path d=\"M12 3v12\"/><path d=\"M7 10l5 5 5-5\"/><path d=\"M5 21h14\"/></svg>\n      Download resume\n    </a>\n    <a class=\"btn btn-primary\" href=\"#contact\" data-menu-link>Say hello</a>\n    <span class=\"foot-note\">safakaware02@gmail.com</span>\n  </div>\n</div>\n\n<main id=\"top\">\n\n  <!-- HERO -->\n  <section class=\"hero wrap\">\n    <div>\n      <span class=\"eyebrow\">Computer Science \u00b7 AI &amp; ML \u00b7 Chiplun, Maharashtra</span>\n      <h1>I build things <em>that ship.</em></h1>\n      <p>I'm a third-year engineering student who turns ideas into working software \u2014 machine learning models, full-stack platforms, and the occasional piece of hardware. No filler, just built things.</p>\n      <div class=\"hero-cta-row\">\n        <a class=\"btn btn-primary\" href=\"#work\">See my work</a>\n        <a class=\"btn btn-ghost\" href=\"Safa_Kaware_Resume.pdf\" download>\n          <svg viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"1.8\" stroke-linecap=\"round\" stroke-linejoin=\"round\" aria-hidden=\"true\"><path d=\"M12 3v12\"/><path d=\"M7 10l5 5 5-5\"/><path d=\"M5 21h14\"/></svg>\n          Download resume\n        </a>\n      </div>\n    </div>\n    <div class=\"hero-art\">\n      <svg class=\"photo-ring\" viewBox=\"0 0 380 380\" aria-hidden=\"true\">\n        <defs>\n          <path id=\"ringPath\" d=\"M190,30 a160,160 0 1,1 -0.1,0\" fill=\"none\"/>\n        </defs>\n        <text>\n          <textPath href=\"#ringPath\" startOffset=\"0%\">\n            SAFA KAWARE &#8226; AI &amp; ML ENGINEER &#8227; FULL-STACK BUILDER &#8226; CHIPLUN, MAHARASHTRA &#8226;\n          </textPath>\n        </text>\n      </svg>\n\n      <div class=\"hero-dot\" style=\"inset:0;\">\n        <i style=\"top:6%; left:50%; background:var(--plum); transform:translateX(-50%);\"></i>\n      </div>\n      <div class=\"hero-dot\" style=\"inset:0; animation-direction:reverse; animation-duration:16s;\">\n        <i style=\"bottom:8%; right:14%; background:var(--gold);\"></i>\n      </div>\n\n      <div class=\"photo-frame\">\n        <!-- To use your own photo: just change the src below to your photo's filename -->\n        <img src=\"20251124_133518.jpg\" alt=\"Safa Kaware\"\n             onerror=\"this.style.display='none'; document.getElementById('photoPlaceholder').style.display='flex';\">\n        <div class=\"photo-placeholder\" id=\"photoPlaceholder\" style=\"display:none;\">\n          <svg viewBox=\"0 0 24 24\" fill=\"none\" aria-hidden=\"true\"><circle cx=\"12\" cy=\"8\" r=\"4\" stroke=\"#33503F\" stroke-width=\"1.6\"/><path d=\"M4 20c1.5-4 4.5-6 8-6s6.5 2 8 6\" stroke=\"#33503F\" stroke-width=\"1.6\" stroke-linecap=\"round\"/></svg>\n          <span>Drop your photo in here</span>\n        </div>\n      </div>\n    </div>\n  </section>\n\n  <!-- ABOUT -->\n  <section id=\"about\" class=\"wrap\">\n    <div class=\"section-head reveal\">\n      <span class=\"eyebrow\">About</span>\n      <h2>A short introduction, four ways.</h2>\n    </div>\n    <div class=\"about-grid\">\n      <div class=\"about-card reveal\"><span class=\"num\">01</span>\n        <h3>The Engineer</h3>\n        <p>I'm a T.E. Computer Science (AI &amp; ML) student at Gharda Institute of Technology, Khed \u2014 8.98 CGPA and holding. Based in Chiplun, Maharashtra.</p>\n      </div>\n      <div class=\"about-card reveal\"><span class=\"num\">02</span>\n        <h3>The Builder</h3>\n        <p>I've shipped five live projects, from a dropout-prediction model to a generative AI cooking platform \u2014 each one built, not just scoped.</p>\n      </div>\n      <div class=\"about-card reveal\"><span class=\"num\">03</span>\n        <h3>The Learner</h3>\n        <p>I trained in full-stack Java and database systems at Seed InfoTech \u2014 I like adding a tool before I need it.</p>\n      </div>\n      <div class=\"about-card reveal\"><span class=\"num\">04</span>\n        <h3>The Approach</h3>\n        <p>I'm confident about what I've built, honest about what I'm still learning. No exaggeration required.</p>\n      </div>\n    </div>\n  </section>\n\n  <!-- SKILLS -->\n  <section id=\"skills\" class=\"wrap\">\n    <div class=\"section-head reveal\">\n      <span class=\"eyebrow\">Toolkit</span>\n      <h2>What I build with.</h2>\n    </div>\n    <div class=\"skills-wrap\" id=\"skillsWrap\"><!-- rendered from site data --></div>\n  </section>\n\n  <!-- WORK -->\n  <section id=\"work\" class=\"wrap\">\n    <div class=\"section-head reveal\">\n      <span class=\"eyebrow\">Selected Work</span>\n      <h2>Five builds, five different problems.</h2>\n      <p>Each project below is live \u2014 click through to see it running, or check my code.</p>\n    </div>\n    <div class=\"project-list\" id=\"projectList\"><!-- rendered from site data --></div>\n  </section>\n\n  <!-- LEARNING -->\n  <section id=\"learning\" class=\"wrap\">\n    <div class=\"section-head reveal\">\n      <span class=\"eyebrow\">Continuing Education</span>\n      <h2>Still adding to my toolkit.</h2>\n    </div>\n    <div class=\"train-list\" id=\"trainList\"><!-- rendered from site data --></div>\n  </section>\n\n  <!-- CERTIFICATES -->\n  <section id=\"certificates\" class=\"wrap\">\n    <div class=\"section-head reveal\">\n      <span class=\"eyebrow\">Certificates</span>\n      <h2>Proof of the work.</h2>\n    </div>\n\n    <div id=\"certGroups\"><!-- rendered from site data --></div>\n  </section>\n\n  <!-- CONTACT -->\n  <section id=\"contact\" class=\"wrap\">\n    <div class=\"section-head reveal\">\n      <span class=\"eyebrow\">Contact</span>\n      <h2>Hiring, or just want to talk?</h2>\n      <p>Fill this in and it'll open up ready to send \u2014 or skip straight to <a href=\"mailto:safakaware02@gmail.com\" style=\"color:var(--plum); text-decoration:underline;\">safakaware02@gmail.com</a>.</p>\n    </div>\n\n    <form id=\"contactForm\" class=\"contact-form reveal\" novalidate>\n      <div class=\"form-row\">\n        <div class=\"field\">\n          <label for=\"cf-name\">Your name*</label>\n          <input type=\"text\" id=\"cf-name\" name=\"name\" required autocomplete=\"name\">\n        </div>\n        <div class=\"field\">\n          <label for=\"cf-email\">Your email*</label>\n          <input type=\"email\" id=\"cf-email\" name=\"email\" required autocomplete=\"email\">\n        </div>\n      </div>\n      <div class=\"form-row\">\n        <div class=\"field\">\n          <label for=\"cf-company\">Company / organization</label>\n          <input type=\"text\" id=\"cf-company\" name=\"company\" autocomplete=\"organization\">\n        </div>\n        <div class=\"field\">\n          <label for=\"cf-role\">Role you're hiring for</label>\n          <input type=\"text\" id=\"cf-role\" name=\"role\" placeholder=\"e.g. AI/ML Intern\">\n        </div>\n      </div>\n      <div class=\"field\">\n        <label for=\"cf-message\">Message*</label>\n        <textarea id=\"cf-message\" name=\"message\" rows=\"5\" required placeholder=\"Tell me a bit about the opportunity...\"></textarea>\n      </div>\n      <div class=\"form-foot\">\n        <button type=\"submit\" class=\"btn btn-primary\">Send message</button>\n        <span id=\"cf-status\" class=\"form-status\"></span>\n      </div>\n    </form>\n    <p class=\"contact-resume-note reveal\">\n      Prefer to just look at the r\u00e9sum\u00e9?\n      <a href=\"Safa_Kaware_Resume.pdf\" download>\n        <svg viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"1.8\" stroke-linecap=\"round\" stroke-linejoin=\"round\" aria-hidden=\"true\"><path d=\"M12 3v12\"/><path d=\"M7 10l5 5 5-5\"/><path d=\"M5 21h14\"/></svg>\n        Download PDF\n      </a>\n    </p>\n  </section>\n\n</main>\n\n<footer>\n  <div class=\"wrap\">\n    <span class=\"eyebrow\" style=\"color:#BE8F2E;\">\u00a9 2026</span>\n    <h2>Talk soon.</h2>\n    <div class=\"footer-cta\">\n      <a class=\"btn btn-primary\" href=\"#contact\">Say hello</a>\n      <a class=\"btn btn-ghost\" href=\"Safa_Kaware_Resume.pdf\" download>\n        <svg viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"1.8\" stroke-linecap=\"round\" stroke-linejoin=\"round\" aria-hidden=\"true\"><path d=\"M12 3v12\"/><path d=\"M7 10l5 5 5-5\"/><path d=\"M5 21h14\"/></svg>\n        Download resume\n      </a>\n    </div>\n    <div class=\"foot-bottom\">\n      <span>Safa Salim Kaware \u00b7 Chiplun, Maharashtra</span>\n      <a href=\"https://github.com/safa-kaware\" target=\"_blank\" rel=\"noopener\">GitHub \u2197</a>\n    </div>\n  </div>\n</footer>\n\n<!--\n  SITE DATA \u2014 everything below is what powers the Work, Skills, Learning, and\n  Certificates sections above. Don't want to hand-edit this JSON? Open\n  admin.html (kept out of the deployed site) and use the form-based editor\n  instead \u2014 it can export a fresh, updated copy of this whole file.\n-->\n<script type=\"application/json\" id=\"site-data\">\n__SITE_DATA_PLACEHOLDER__\n<\/script>\n<script src=\"script.js\"><\/script>\n\n</body>\n</html>\n";
+
+const DEFAULT_DATA = {
+  "projects": [
+    {
+      "id": "proj-dropout",
+      "title": "AI for Silent Dropouts",
+      "category": "Academic Prediction Engine",
+      "description": "A classification model that flags students at risk of quietly dropping out, using academic records, attendance, and behavioral signals to enable early intervention.",
+      "meta": "94.2% prediction accuracy \u00b7 Random Forest pipeline",
+      "tags": [
+        "Python",
+        "Scikit-Learn",
+        "Pandas",
+        "NumPy",
+        "Matplotlib"
+      ],
+      "demoUrl": "https://ai-for-silent-dropouts.vercel.app/",
+      "githubUrl": "https://github.com/safa-kaware/ai-for-silent-dropouts"
+    },
+    {
+      "id": "proj-pinkapron",
+      "title": "Pink Apron",
+      "category": "Generative AI Culinary Platform",
+      "description": "A social cooking app where a dish idea or a handful of ingredients becomes a structured recipe \u2014 measurements, steps, and timing \u2014 via custom prompt engineering on Claude.",
+      "meta": "Full-stack \u00b7 Direct LLM orchestration",
+      "tags": [
+        "React.js",
+        "Node.js",
+        "Express",
+        "MongoDB",
+        "Claude API",
+        "Tailwind CSS"
+      ],
+      "demoUrl": "https://pinkapron.vercel.app",
+      "githubUrl": "https://github.com/safa-kaware/pink-apron"
+    },
+    {
+      "id": "proj-apexarena",
+      "title": "Apex Arena",
+      "category": "Sports Enterprise Automation",
+      "description": "An administration platform for sports clubs and training complexes, with an interactive scheduling matrix and conflict-resolution logic for shared resources.",
+      "meta": "Multi-resource scheduler \u00b7 Real-time dashboards",
+      "tags": [
+        "React.js",
+        "Node.js",
+        "Firebase",
+        "MySQL",
+        "Tailwind CSS"
+      ],
+      "demoUrl": "https://apex-arena-pi.vercel.app",
+      "githubUrl": "https://github.com/safa-kaware/apex-arena"
+    },
+    {
+      "id": "proj-lifi",
+      "title": "Li-Fi Using Arduino",
+      "category": "Wireless Visible Light Communication",
+      "description": "A hardware prototype that transmits text over light. Custom encoders turn digital commands into high-speed LED flashes, decoded on the other end by a photodiode array.",
+      "meta": "LED-based high-frequency pulse encoding",
+      "tags": [
+        "Arduino",
+        "C/C++",
+        "Photodiode",
+        "Serial Comm"
+      ],
+      "demoUrl": "https://li-fi-using-arduino.vercel.app/",
+      "githubUrl": "https://github.com/safa-kaware/Li-fi-using-Arduino"
+    },
+    {
+      "id": "proj-volunteer",
+      "title": "Volunteer Registration System",
+      "category": "NGO Volunteer Ecosystem",
+      "description": "An onboarding and admin hub built for NayePankh, a community NGO \u2014 verification pathways, checklist tracking, and a chatbot that answers common onboarding questions.",
+      "meta": "Automated onboarding workflow",
+      "tags": [
+        "React.js",
+        "Firebase Firestore",
+        "AI Chatbot",
+        "Admin Dashboard"
+      ],
+      "demoUrl": "https://volunteer-registration-system-for-n.vercel.app/",
+      "githubUrl": "https://github.com/safa-kaware/volunteer-registration-system-for-nayepankh"
+    }
+  ],
+  "skills": [
+    {
+      "id": "skill-lang",
+      "group": "Languages",
+      "chips": [
+        "Python",
+        "Java",
+        "C",
+        "PHP",
+        "JavaScript",
+        "TypeScript",
+        "HTML5",
+        "CSS"
+      ]
+    },
+    {
+      "id": "skill-aiml",
+      "group": "AI & ML",
+      "chips": [
+        "NumPy",
+        "Pandas",
+        "Scikit-Learn",
+        "Matplotlib",
+        "TensorFlow"
+      ]
+    },
+    {
+      "id": "skill-data",
+      "group": "Data",
+      "chips": [
+        "MySQL",
+        "MongoDB",
+        "SQLite",
+        "Firebase Firestore"
+      ]
+    },
+    {
+      "id": "skill-tools",
+      "group": "Tools",
+      "chips": [
+        "Git & GitHub",
+        "VS Code",
+        "Colab",
+        "Vercel",
+        "Canva"
+      ]
+    }
+  ],
+  "learning": [
+    {
+      "id": "learn-java",
+      "when": "Jul 2025 \u2013 Oct 2025",
+      "title": "Full Stack Java Programming",
+      "description": "Seed InfoTech Ltd, Pune \u2014 backend architecture, OOP in Java, and API design."
+    },
+    {
+      "id": "learn-dbms",
+      "when": "Jan 2026 \u2013 Feb 2026",
+      "title": "Database Management Systems",
+      "description": "Seed InfoTech Ltd, Pune \u2014 SQL, normalization, schema optimization, and NoSQL with MongoDB."
+    }
+  ],
+  "certificateGroups": [
+    {
+      "id": "certgrp-training",
+      "groupTitle": "Training Certificates",
+      "items": [
+        {
+          "id": "cert-java",
+          "title": "Full Stack Java Programming",
+          "meta": "Seed InfoTech Ltd, Pune \u00b7 Jul 2025 \u2013 Oct 2025",
+          "href": "certificates/full-stack-java-course.jpg"
+        },
+        {
+          "id": "cert-dbms",
+          "title": "Database Management Systems",
+          "meta": "Seed InfoTech Ltd, Pune \u00b7 Jan 2026 \u2013 Feb 2026",
+          "href": "certificates/dbms-certificate.pdf"
+        }
+      ]
+    },
+    {
+      "id": "certgrp-course",
+      "groupTitle": "Course Certificates",
+      "items": []
+    }
+  ]
+};
+
+// ============================================================
+// PORTFOLIO ADMIN — local, password-gated content editor.
+// Keep this file on your own computer only — do not upload it
+// to your live site alongside index.html.
+// ============================================================
+
+const PW_HASH_KEY = 'portfolioAdmin_pwHash';
+const DATA_KEY = 'portfolioAdmin_siteData';
+
+// Some environments (sandboxed preview iframes, private-browsing modes,
+// file:// pages in some browsers) block localStorage entirely and throw
+// on access instead of just being empty. Fall back to in-memory storage
+// so the app still works in that session — it just won't persist across
+// a full page reload until it's opened as a normal local file.
+const memoryStore = {};
+let storageIsPersistent = true;
+function safeGet(key){
+  try { return localStorage.getItem(key); }
+  catch(e){ storageIsPersistent = false; return Object.prototype.hasOwnProperty.call(memoryStore, key) ? memoryStore[key] : null; }
+}
+function safeSet(key, value){
+  try { localStorage.setItem(key, value); }
+  catch(e){ storageIsPersistent = false; memoryStore[key] = value; }
+}
+
+function simpleHash(str){
+  let h = 5381;
+  for(let i = 0; i < str.length; i++){
+    h = ((h << 5) + h) + str.charCodeAt(i);
+    h = h & h;
+  }
+  return 'h' + Math.abs(h).toString(36);
+}
+
+function uid(prefix){
+  return prefix + '-' + Math.random().toString(36).slice(2, 9);
+}
+
+function showToast(msg){
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  clearTimeout(showToast._t);
+  showToast._t = setTimeout(() => t.classList.remove('show'), 2200);
+}
+
+// ---------- Gate ----------
+const gate = document.getElementById('gate');
+const gateForm = document.getElementById('gateForm');
+const gatePassword = document.getElementById('gatePassword');
+const gateError = document.getElementById('gateError');
+const gateTitle = document.getElementById('gateTitle');
+const gateSubmit = document.getElementById('gateSubmit');
+const gateNote = document.getElementById('gateNote');
+const app = document.getElementById('app');
+
+const hasPassword = !!safeGet(PW_HASH_KEY);
+if(!hasPassword){
+  gateTitle.textContent = 'Set an admin password';
+  gateSubmit.textContent = 'Save & unlock';
+  gateNote.innerHTML = 'First time here — pick a password. It\'s stored only in this browser, on this computer. Keep this file (<code>admin.html</code>) off your live site.';
+}
+
+gateForm.addEventListener('submit', (e) => {
+  e.preventDefault();
+  const val = gatePassword.value;
+  if(!val){ return; }
+
+  if(!hasPassword){
+    if(val.length < 4){
+      gateError.textContent = 'Use at least 4 characters.';
+      return;
+    }
+    safeSet(PW_HASH_KEY, simpleHash(val));
+    unlock();
+    return;
+  }
+
+  if(simpleHash(val) === safeGet(PW_HASH_KEY)){
+    unlock();
+  } else {
+    gateError.textContent = 'Wrong password.';
+    gatePassword.value = '';
+    gatePassword.focus();
+  }
+});
+
+function unlock(){
+  gate.style.display = 'none';
+  app.classList.add('visible');
+  if(!storageIsPersistent){
+    document.getElementById('storageWarning').style.display = 'block';
+    app.style.paddingTop = '38px';
+  }
+  renderTab(currentTab);
+}
+
+document.getElementById('lockBtn').addEventListener('click', () => {
+  app.classList.remove('visible');
+  gate.style.display = 'flex';
+  gatePassword.value = '';
+  gateError.textContent = '';
+  gatePassword.focus();
+});
+
+// ---------- State ----------
+function loadState(){
+  const raw = safeGet(DATA_KEY);
+  if(raw){
+    try { return JSON.parse(raw); } catch(e){ /* fall through */ }
+  }
+  return JSON.parse(JSON.stringify(DEFAULT_DATA));
+}
+function saveState(){
+  safeSet(DATA_KEY, JSON.stringify(state));
+}
+let state = loadState();
+
+// ---------- Tabs ----------
+let currentTab = 'projects';
+document.querySelectorAll('.tab').forEach((btn) => {
+  btn.addEventListener('click', () => {
+    document.querySelectorAll('.tab').forEach((b) => b.classList.remove('active'));
+    btn.classList.add('active');
+    currentTab = btn.dataset.tab;
+    renderTab(currentTab);
+  });
+});
+
+function esc(s){
+  return String(s ?? '').replace(/[&<>"']/g, (m) => ({ '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;' }[m]));
+}
+
+const main = document.getElementById('main');
+
+function renderTab(tab){
+  if(tab === 'projects') return renderProjects();
+  if(tab === 'skills') return renderSkills();
+  if(tab === 'certificates') return renderCertificates();
+  if(tab === 'learning') return renderLearning();
+  if(tab === 'export') return renderExport();
+}
+
+// ============================================================
+// PROJECTS
+// ============================================================
+function renderProjects(editingId){
+  const p = editingId ? state.projects.find((x) => x.id === editingId) : null;
+  main.innerHTML = `
+    <h2>Projects</h2>
+    <p class="sub">These populate the "Work" section on your site.</p>
+    <button class="btn-add" id="btnAddProject">${p ? 'Cancel edit' : '+ Add a project'}</button>
+    <div id="projectFormSlot"></div>
+    <div id="projectListSlot"></div>
+  `;
+  document.getElementById('btnAddProject').addEventListener('click', () => {
+    if(p){ renderProjects(); } else { showProjectForm(); }
+  });
+
+  if(p){ showProjectForm(p); }
+
+  const listSlot = document.getElementById('projectListSlot');
+  if(!state.projects.length){
+    listSlot.innerHTML = `<div class="empty">No projects yet. Add your first one above.</div>`;
+    return;
+  }
+  listSlot.innerHTML = state.projects.map((item) => `
+    <div class="card">
+      <div class="card-row">
+        <div>
+          <h3>${esc(item.title)}</h3>
+          <div class="meta">${esc(item.category)}</div>
+        </div>
+        <div class="card-actions">
+          <button class="icon-btn" data-edit="${item.id}" title="Edit">&#9998;</button>
+          <button class="icon-btn danger" data-del="${item.id}" title="Delete">&times;</button>
+        </div>
+      </div>
+      <div class="chip-list">${(item.tags || []).map((t) => `<span>${esc(t)}</span>`).join('')}</div>
+    </div>
+  `).join('');
+  listSlot.querySelectorAll('[data-edit]').forEach((b) => b.addEventListener('click', () => renderProjects(b.dataset.edit)));
+  listSlot.querySelectorAll('[data-del]').forEach((b) => b.addEventListener('click', () => {
+    if(!confirm('Delete this project?')) return;
+    state.projects = state.projects.filter((x) => x.id !== b.dataset.del);
+    saveState();
+    renderProjects();
+    showToast('Project deleted');
+  }));
+}
+
+function showProjectForm(existing){
+  const slot = document.getElementById('projectFormSlot');
+  const isEdit = !!existing;
+  slot.innerHTML = `
+    <form class="editor" id="projectForm">
+      <h4>${isEdit ? 'Edit project' : 'New project'}</h4>
+      <div class="field-row">
+        <div class="field"><label>Title</label><input type="text" name="title" required value="${esc(existing?.title || '')}"></div>
+        <div class="field"><label>Category / tagline</label><input type="text" name="category" value="${esc(existing?.category || '')}" placeholder="e.g. Full-stack platform"></div>
+      </div>
+      <div class="field"><label>Description</label><textarea name="description" rows="3">${esc(existing?.description || '')}</textarea></div>
+      <div class="field-row">
+        <div class="field"><label>Meta line (small detail under description)</label><input type="text" name="meta" value="${esc(existing?.meta || '')}" placeholder="e.g. 94.2% accuracy · Random Forest"></div>
+        <div class="field"><label>Tags (comma separated)</label><input type="text" name="tags" value="${esc((existing?.tags || []).join(', '))}" placeholder="React, Node.js, MongoDB"></div>
+      </div>
+      <div class="field-row">
+        <div class="field"><label>Live demo URL</label><input type="url" name="demoUrl" value="${esc(existing?.demoUrl || '')}" placeholder="https://..."></div>
+        <div class="field"><label>GitHub URL</label><input type="url" name="githubUrl" value="${esc(existing?.githubUrl || '')}" placeholder="https://github.com/..."></div>
+      </div>
+      <div class="form-actions">
+        <button type="submit" class="btn btn-primary">${isEdit ? 'Save changes' : 'Add project'}</button>
+        <button type="button" class="btn btn-ghost" id="cancelProjectForm">Cancel</button>
+      </div>
+    </form>
+  `;
+  document.getElementById('cancelProjectForm').addEventListener('click', () => renderProjects());
+  document.getElementById('projectForm').addEventListener('submit', (e) => {
+    e.preventDefault();
+    const f = new FormData(e.target);
+    const tags = String(f.get('tags') || '').split(',').map((t) => t.trim()).filter(Boolean);
+    const payload = {
+      title: String(f.get('title') || '').trim(),
+      category: String(f.get('category') || '').trim(),
+      description: String(f.get('description') || '').trim(),
+      meta: String(f.get('meta') || '').trim(),
+      tags,
+      demoUrl: String(f.get('demoUrl') || '').trim(),
+      githubUrl: String(f.get('githubUrl') || '').trim(),
+    };
+    if(!payload.title){ return; }
+    if(isEdit){
+      Object.assign(existing, payload);
+    } else {
+      state.projects.push({ id: uid('proj'), ...payload });
+    }
+    saveState();
+    renderProjects();
+    showToast(isEdit ? 'Project updated' : 'Project added');
+  });
+}
+
+// ============================================================
+// SKILLS
+// ============================================================
+function renderSkills(editingId){
+  const g = editingId ? state.skills.find((x) => x.id === editingId) : null;
+  main.innerHTML = `
+    <h2>Skills</h2>
+    <p class="sub">Grouped chips shown in the "Toolkit" section.</p>
+    <button class="btn-add" id="btnAddSkill">${g ? 'Cancel edit' : '+ Add a skill group'}</button>
+    <div id="skillFormSlot"></div>
+    <div id="skillListSlot"></div>
+  `;
+  document.getElementById('btnAddSkill').addEventListener('click', () => g ? renderSkills() : showSkillForm());
+  if(g){ showSkillForm(g); }
+
+  const listSlot = document.getElementById('skillListSlot');
+  if(!state.skills.length){
+    listSlot.innerHTML = `<div class="empty">No skill groups yet.</div>`;
+    return;
+  }
+  listSlot.innerHTML = state.skills.map((item) => `
+    <div class="card">
+      <div class="card-row">
+        <h3>${esc(item.group)}</h3>
+        <div class="card-actions">
+          <button class="icon-btn" data-edit="${item.id}" title="Edit">&#9998;</button>
+          <button class="icon-btn danger" data-del="${item.id}" title="Delete">&times;</button>
+        </div>
+      </div>
+      <div class="chip-list">${(item.chips || []).map((c) => `<span>${esc(c)}</span>`).join('')}</div>
+    </div>
+  `).join('');
+  listSlot.querySelectorAll('[data-edit]').forEach((b) => b.addEventListener('click', () => renderSkills(b.dataset.edit)));
+  listSlot.querySelectorAll('[data-del]').forEach((b) => b.addEventListener('click', () => {
+    if(!confirm('Delete this skill group?')) return;
+    state.skills = state.skills.filter((x) => x.id !== b.dataset.del);
+    saveState();
+    renderSkills();
+    showToast('Skill group deleted');
+  }));
+}
+
+function showSkillForm(existing){
+  const slot = document.getElementById('skillFormSlot');
+  const isEdit = !!existing;
+  slot.innerHTML = `
+    <form class="editor" id="skillForm">
+      <h4>${isEdit ? 'Edit skill group' : 'New skill group'}</h4>
+      <div class="field-row">
+        <div class="field"><label>Group name</label><input type="text" name="group" required value="${esc(existing?.group || '')}" placeholder="e.g. Languages"></div>
+      </div>
+      <div class="field"><label>Skills (comma separated)</label><input type="text" name="chips" value="${esc((existing?.chips || []).join(', '))}" placeholder="Python, Java, C"></div>
+      <div class="form-actions">
+        <button type="submit" class="btn btn-primary">${isEdit ? 'Save changes' : 'Add group'}</button>
+        <button type="button" class="btn btn-ghost" id="cancelSkillForm">Cancel</button>
+      </div>
+    </form>
+  `;
+  document.getElementById('cancelSkillForm').addEventListener('click', () => renderSkills());
+  document.getElementById('skillForm').addEventListener('submit', (e) => {
+    e.preventDefault();
+    const f = new FormData(e.target);
+    const chips = String(f.get('chips') || '').split(',').map((t) => t.trim()).filter(Boolean);
+    const group = String(f.get('group') || '').trim();
+    if(!group){ return; }
+    if(isEdit){
+      existing.group = group;
+      existing.chips = chips;
+    } else {
+      state.skills.push({ id: uid('skill'), group, chips });
+    }
+    saveState();
+    renderSkills();
+    showToast(isEdit ? 'Skill group updated' : 'Skill group added');
+  });
+}
+
+// ============================================================
+// LEARNING
+// ============================================================
+function renderLearning(editingId){
+  const l = editingId ? state.learning.find((x) => x.id === editingId) : null;
+  main.innerHTML = `
+    <h2>Learning</h2>
+    <p class="sub">Timeline entries for "Continuing Education".</p>
+    <button class="btn-add" id="btnAddLearning">${l ? 'Cancel edit' : '+ Add a learning entry'}</button>
+    <div id="learningFormSlot"></div>
+    <div id="learningListSlot"></div>
+  `;
+  document.getElementById('btnAddLearning').addEventListener('click', () => l ? renderLearning() : showLearningForm());
+  if(l){ showLearningForm(l); }
+
+  const listSlot = document.getElementById('learningListSlot');
+  if(!state.learning.length){
+    listSlot.innerHTML = `<div class="empty">Nothing here yet.</div>`;
+    return;
+  }
+  listSlot.innerHTML = state.learning.map((item) => `
+    <div class="card">
+      <div class="card-row">
+        <div>
+          <h3>${esc(item.title)}</h3>
+          <div class="meta">${esc(item.when)}</div>
+        </div>
+        <div class="card-actions">
+          <button class="icon-btn" data-edit="${item.id}" title="Edit">&#9998;</button>
+          <button class="icon-btn danger" data-del="${item.id}" title="Delete">&times;</button>
+        </div>
+      </div>
+    </div>
+  `).join('');
+  listSlot.querySelectorAll('[data-edit]').forEach((b) => b.addEventListener('click', () => renderLearning(b.dataset.edit)));
+  listSlot.querySelectorAll('[data-del]').forEach((b) => b.addEventListener('click', () => {
+    if(!confirm('Delete this entry?')) return;
+    state.learning = state.learning.filter((x) => x.id !== b.dataset.del);
+    saveState();
+    renderLearning();
+    showToast('Entry deleted');
+  }));
+}
+
+function showLearningForm(existing){
+  const slot = document.getElementById('learningFormSlot');
+  const isEdit = !!existing;
+  slot.innerHTML = `
+    <form class="editor" id="learningForm">
+      <h4>${isEdit ? 'Edit entry' : 'New entry'}</h4>
+      <div class="field-row">
+        <div class="field"><label>Title</label><input type="text" name="title" required value="${esc(existing?.title || '')}"></div>
+        <div class="field"><label>When</label><input type="text" name="when" value="${esc(existing?.when || '')}" placeholder="e.g. Jul 2025 – Oct 2025"></div>
+      </div>
+      <div class="field"><label>Description</label><textarea name="description" rows="2">${esc(existing?.description || '')}</textarea></div>
+      <div class="form-actions">
+        <button type="submit" class="btn btn-primary">${isEdit ? 'Save changes' : 'Add entry'}</button>
+        <button type="button" class="btn btn-ghost" id="cancelLearningForm">Cancel</button>
+      </div>
+    </form>
+  `;
+  document.getElementById('cancelLearningForm').addEventListener('click', () => renderLearning());
+  document.getElementById('learningForm').addEventListener('submit', (e) => {
+    e.preventDefault();
+    const f = new FormData(e.target);
+    const payload = {
+      title: String(f.get('title') || '').trim(),
+      when: String(f.get('when') || '').trim(),
+      description: String(f.get('description') || '').trim(),
+    };
+    if(!payload.title){ return; }
+    if(isEdit){
+      Object.assign(existing, payload);
+    } else {
+      state.learning.push({ id: uid('learn'), ...payload });
+    }
+    saveState();
+    renderLearning();
+    showToast(isEdit ? 'Entry updated' : 'Entry added');
+  });
+}
+
+// ============================================================
+// CERTIFICATES
+// ============================================================
+function renderCertificates(editing){
+  // editing = { groupId, itemId } or null
+  main.innerHTML = `
+    <h2>Certificates</h2>
+    <p class="sub">Grouped certificate cards. A group with no certificates is simply hidden on the site — no more dead "coming soon" links.</p>
+    <button class="btn-add" id="btnAddGroup">+ Add a certificate group</button>
+    <div id="groupFormSlot"></div>
+    <div id="certGroupsSlot"></div>
+  `;
+  document.getElementById('btnAddGroup').addEventListener('click', showGroupForm);
+
+  const slot = document.getElementById('certGroupsSlot');
+  if(!state.certificateGroups.length){
+    slot.innerHTML = `<div class="empty">No certificate groups yet.</div>`;
+    return;
+  }
+  slot.innerHTML = state.certificateGroups.map((group) => `
+    <div class="group-title-row">
+      <h3>${esc(group.groupTitle)}</h3>
+      <div class="card-actions">
+        <button class="icon-btn" data-add-item="${group.id}" title="Add certificate">+</button>
+        <button class="icon-btn" data-edit-group="${group.id}" title="Rename group">&#9998;</button>
+        <button class="icon-btn danger" data-del-group="${group.id}" title="Delete group">&times;</button>
+      </div>
+    </div>
+    <div id="itemFormSlot-${group.id}"></div>
+    ${(group.items || []).length ? group.items.map((item) => `
+      <div class="card">
+        <div class="card-row">
+          <div>
+            <h3>${esc(item.title)}</h3>
+            <div class="meta">${esc(item.meta)}</div>
+          </div>
+          <div class="card-actions">
+            <button class="icon-btn" data-edit-item="${group.id}|${item.id}" title="Edit">&#9998;</button>
+            <button class="icon-btn danger" data-del-item="${group.id}|${item.id}" title="Delete">&times;</button>
+          </div>
+        </div>
+      </div>
+    `).join('') : `<div class="empty">No certificates in this group yet.</div>`}
+  `).join('');
+
+  slot.querySelectorAll('[data-add-item]').forEach((b) => b.addEventListener('click', () => showCertItemForm(b.dataset.addItem)));
+  slot.querySelectorAll('[data-edit-item]').forEach((b) => {
+    const [gId, iId] = b.dataset.editItem.split('|');
+    b.addEventListener('click', () => showCertItemForm(gId, iId));
+  });
+  slot.querySelectorAll('[data-del-item]').forEach((b) => {
+    const [gId, iId] = b.dataset.delItem.split('|');
+    b.addEventListener('click', () => {
+      if(!confirm('Delete this certificate?')) return;
+      const grp = state.certificateGroups.find((x) => x.id === gId);
+      grp.items = grp.items.filter((x) => x.id !== iId);
+      saveState();
+      renderCertificates();
+      showToast('Certificate deleted');
+    });
+  });
+  slot.querySelectorAll('[data-edit-group]').forEach((b) => b.addEventListener('click', () => showGroupForm(b.dataset.editGroup)));
+  slot.querySelectorAll('[data-del-group]').forEach((b) => b.addEventListener('click', () => {
+    if(!confirm('Delete this entire group and its certificates?')) return;
+    state.certificateGroups = state.certificateGroups.filter((x) => x.id !== b.dataset.delGroup);
+    saveState();
+    renderCertificates();
+    showToast('Group deleted');
+  }));
+}
+
+function showGroupForm(editingId){
+  const existing = editingId ? state.certificateGroups.find((x) => x.id === editingId) : null;
+  const slot = document.getElementById('groupFormSlot');
+  slot.innerHTML = `
+    <form class="editor" id="groupForm">
+      <h4>${existing ? 'Rename group' : 'New certificate group'}</h4>
+      <div class="field"><label>Group name</label><input type="text" name="groupTitle" required value="${esc(existing?.groupTitle || '')}" placeholder="e.g. Course Certificates"></div>
+      <div class="form-actions">
+        <button type="submit" class="btn btn-primary">${existing ? 'Save' : 'Add group'}</button>
+        <button type="button" class="btn btn-ghost" id="cancelGroupForm">Cancel</button>
+      </div>
+    </form>
+  `;
+  document.getElementById('cancelGroupForm').addEventListener('click', () => renderCertificates());
+  document.getElementById('groupForm').addEventListener('submit', (e) => {
+    e.preventDefault();
+    const title = String(new FormData(e.target).get('groupTitle') || '').trim();
+    if(!title) return;
+    if(existing){
+      existing.groupTitle = title;
+    } else {
+      state.certificateGroups.push({ id: uid('certgrp'), groupTitle: title, items: [] });
+    }
+    saveState();
+    renderCertificates();
+    showToast(existing ? 'Group renamed' : 'Group added');
+  });
+}
+
+function showCertItemForm(groupId, itemId){
+  const group = state.certificateGroups.find((x) => x.id === groupId);
+  const existing = itemId ? group.items.find((x) => x.id === itemId) : null;
+  const slot = document.getElementById(`itemFormSlot-${groupId}`);
+  const startMode = existing && existing.href && existing.href.startsWith('data:') ? 'upload' : 'path';
+  slot.innerHTML = `
+    <form class="editor" id="certItemForm-${groupId}">
+      <h4>${existing ? 'Edit certificate' : 'New certificate'}</h4>
+      <div class="field-row">
+        <div class="field"><label>Title</label><input type="text" name="title" required value="${esc(existing?.title || '')}" placeholder="e.g. Google Data Analytics"></div>
+        <div class="field"><label>Meta (issuer &middot; dates)</label><input type="text" name="meta" value="${esc(existing?.meta || '')}" placeholder="Coursera · Mar 2026"></div>
+      </div>
+      <div class="radio-row">
+        <label><input type="radio" name="mode" value="path" ${startMode === 'path' ? 'checked' : ''}> Link to a file already in your <code>certificates/</code> folder</label>
+        <label><input type="radio" name="mode" value="upload" ${startMode === 'upload' ? 'checked' : ''}> Upload the file now (embedded directly, no folder needed)</label>
+      </div>
+      <div class="field" id="pathFieldWrap-${groupId}" style="margin-top:10px; ${startMode === 'upload' ? 'display:none;' : ''}">
+        <label>File path</label>
+        <input type="text" name="href" value="${startMode === 'path' ? esc(existing?.href || '') : ''}" placeholder="certificates/my-certificate.pdf">
+        <div class="field-hint">Put the actual file in the <code>certificates/</code> folder, then type its name here.</div>
+      </div>
+      <div class="field" id="uploadFieldWrap-${groupId}" style="margin-top:10px; ${startMode === 'upload' ? '' : 'display:none;'}">
+        <label>Certificate file (PDF or image)</label>
+        <input type="file" name="file" accept=".pdf,image/*">
+        <div class="field-hint">Best for files under a few MB — it gets embedded directly, no separate upload step later.</div>
+      </div>
+      <div class="form-actions">
+        <button type="submit" class="btn btn-primary">${existing ? 'Save changes' : 'Add certificate'}</button>
+        <button type="button" class="btn btn-ghost" id="cancelCertItemForm-${groupId}">Cancel</button>
+      </div>
+    </form>
+  `;
+  const form = document.getElementById(`certItemForm-${groupId}`);
+  form.querySelectorAll('input[name="mode"]').forEach((r) => {
+    r.addEventListener('change', () => {
+      const isUpload = form.mode.value === 'upload';
+      document.getElementById(`pathFieldWrap-${groupId}`).style.display = isUpload ? 'none' : '';
+      document.getElementById(`uploadFieldWrap-${groupId}`).style.display = isUpload ? '' : 'none';
+    });
+  });
+  document.getElementById(`cancelCertItemForm-${groupId}`).addEventListener('click', () => renderCertificates());
+
+  form.addEventListener('submit', (e) => {
+    e.preventDefault();
+    const f = new FormData(form);
+    const title = String(f.get('title') || '').trim();
+    const meta = String(f.get('meta') || '').trim();
+    const mode = f.get('mode');
+    if(!title) return;
+
+    function commit(href){
+      const payload = { title, meta, href };
+      if(existing){
+        Object.assign(existing, payload);
+      } else {
+        group.items.push({ id: uid('cert'), ...payload });
+      }
+      saveState();
+      renderCertificates();
+      showToast(existing ? 'Certificate updated' : 'Certificate added');
+    }
+
+    if(mode === 'upload'){
+      const file = form.file.files[0];
+      if(!file){
+        if(existing && existing.href){ commit(existing.href); return; }
+        alert('Choose a file to upload, or switch to "Link to a file" instead.');
+        return;
+      }
+      const reader = new FileReader();
+      reader.onload = () => commit(reader.result);
+      reader.readAsDataURL(file);
+    } else {
+      const href = String(f.get('href') || '').trim();
+      if(!href){ alert('Enter a file path.'); return; }
+      commit(href);
+    }
+  });
+}
+
+// ============================================================
+// EXPORT
+// ============================================================
+function renderExport(){
+  main.innerHTML = `
+    <h2>Export site</h2>
+    <p class="sub">Generate the updated <code>index.html</code> with everything you've edited.</p>
+    <div class="warn-box">
+      Keep <code>admin.html</code> off your live site. Only upload <code>index.html</code>, <code>styles.css</code>, <code>script.js</code>, and your <code>certificates/</code> folder / other assets.
+    </div>
+    <div class="export-box">
+      <p>This builds a fresh <code>index.html</code> with your current projects, skills, certificates, and learning entries baked in.</p>
+      <ol>
+        <li>Click <strong>Download updated index.html</strong> below.</li>
+        <li>Replace the old <code>index.html</code> in your project folder with the downloaded one.</li>
+        <li>If you added any certificates by <em>linking to a file</em>, make sure that file actually sits inside your <code>certificates/</code> folder before you deploy.</li>
+        <li>Re-deploy / re-upload your site as usual.</li>
+      </ol>
+      <div class="form-actions">
+        <button class="btn btn-primary" id="btnExport">Download updated index.html</button>
+        <button class="btn btn-ghost" id="btnResetAll">Reset all edits</button>
+      </div>
+    </div>
+  `;
+  document.getElementById('btnExport').addEventListener('click', () => {
+    const dataJson = JSON.stringify(state, null, 2);
+    const output = INDEX_TEMPLATE.replace('__SITE_DATA_PLACEHOLDER__', () => dataJson);
+    const blob = new Blob([output], { type: 'text/html' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = 'index.html';
+    document.body.appendChild(a);
+    a.click();
+    a.remove();
+    URL.revokeObjectURL(url);
+    showToast('index.html downloaded');
+  });
+  document.getElementById('btnResetAll').addEventListener('click', () => {
+    if(!confirm('This throws away all edits made in this admin panel and restores the original content. Continue?')) return;
+    state = JSON.parse(JSON.stringify(DEFAULT_DATA));
+    saveState();
+    showToast('Reset to original content');
+  });
+}
+
+</script>
+</body>
+</html>
