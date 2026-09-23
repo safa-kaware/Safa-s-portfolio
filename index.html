@@ -145,7 +145,6 @@
           <svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><circle cx="12" cy="8" r="4" stroke="#33503F" stroke-width="1.6"/><path d="M4 20c1.5-4 4.5-6 8-6s6.5 2 8 6" stroke="#33503F" stroke-width="1.6" stroke-linecap="round"/></svg>
           <span>Drop your photo in here</span>
         </div>
-        <div </div>
       </div>
     </div>
   </section>
@@ -182,37 +181,7 @@
       <span class="eyebrow">Toolkit</span>
       <h2>What I build with.</h2>
     </div>
-    <div class="skills-wrap">
-      <div class="skill-group reveal">
-        <h4>Languages</h4>
-        <div class="chip-row">
-          <span class="chip">Python</span><span class="chip">Java</span><span class="chip">C</span>
-          <span class="chip">PHP</span><span class="chip">JavaScript</span><span class="chip">TypeScript</span>
-          <span class="chip">HTML5</span><span class="chip">CSS</span>
-        </div>
-      </div>
-      <div class="skill-group reveal">
-        <h4>AI &amp; ML</h4>
-        <div class="chip-row">
-          <span class="chip">NumPy</span><span class="chip">Pandas</span><span class="chip">Scikit-Learn</span>
-          <span class="chip">Matplotlib</span><span class="chip">TensorFlow</span>
-        </div>
-      </div>
-      <div class="skill-group reveal">
-        <h4>Data</h4>
-        <div class="chip-row">
-          <span class="chip">MySQL</span><span class="chip">MongoDB</span><span class="chip">SQLite</span>
-          <span class="chip">Firebase Firestore</span>
-        </div>
-      </div>
-      <div class="skill-group reveal">
-        <h4>Tools</h4>
-        <div class="chip-row">
-          <span class="chip">Git &amp; GitHub</span><span class="chip">VS Code</span><span class="chip">Colab</span>
-          <span class="chip">Vercel</span><span class="chip">Canva</span>
-        </div>
-      </div>
-    </div>
+    <div class="skills-wrap" id="skillsWrap"><!-- rendered from site data --></div>
   </section>
 
   <!-- WORK -->
@@ -222,74 +191,7 @@
       <h2>Five builds, five different problems.</h2>
       <p>Each project below is live — click through to see it running, or check my code.</p>
     </div>
-    <div class="project-list">
-
-      <div class="project-card reveal">
-        <div>
-          <div class="project-top"><h3>AI for Silent Dropouts</h3><span class="project-cat">Academic Prediction Engine</span></div>
-          <p class="desc">A classification model that flags students at risk of quietly dropping out, using academic records, attendance, and behavioral signals to enable early intervention.</p>
-          <div class="project-meta">94.2% prediction accuracy · Random Forest pipeline</div>
-          <div class="tag-row"><span class="tag">Python</span><span class="tag">Scikit-Learn</span><span class="tag">Pandas</span><span class="tag">NumPy</span><span class="tag">Matplotlib</span></div>
-        </div>
-        <div class="project-links">
-          <a href="https://ai-for-silent-dropouts.vercel.app/" target="_blank" rel="noopener">Live demo →</a>
-          <a href="https://github.com/safa-kaware/ai-for-silent-dropouts" target="_blank" rel="noopener">GitHub →</a>
-        </div>
-      </div>
-
-      <div class="project-card reveal">
-        <div>
-          <div class="project-top"><h3>Pink Apron</h3><span class="project-cat">Generative AI Culinary Platform</span></div>
-          <p class="desc">A social cooking app where a dish idea or a handful of ingredients becomes a structured recipe — measurements, steps, and timing — via custom prompt engineering on Claude.</p>
-          <div class="project-meta">Full-stack · Direct LLM orchestration</div>
-          <div class="tag-row"><span class="tag">React.js</span><span class="tag">Node.js</span><span class="tag">Express</span><span class="tag">MongoDB</span><span class="tag">Claude API</span><span class="tag">Tailwind CSS</span></div>
-        </div>
-        <div class="project-links">
-          <a href="https://pinkapron.vercel.app" target="_blank" rel="noopener">Live demo →</a>
-          <a href="https://github.com/safa-kaware/pink-apron" target="_blank" rel="noopener">GitHub →</a>
-        </div>
-      </div>
-
-      <div class="project-card reveal">
-        <div>
-          <div class="project-top"><h3>Apex Arena</h3><span class="project-cat">Sports Enterprise Automation</span></div>
-          <p class="desc">An administration platform for sports clubs and training complexes, with an interactive scheduling matrix and conflict-resolution logic for shared resources.</p>
-          <div class="project-meta">Multi-resource scheduler · Real-time dashboards</div>
-          <div class="tag-row"><span class="tag">React.js</span><span class="tag">Node.js</span><span class="tag">Firebase</span><span class="tag">MySQL</span><span class="tag">Tailwind CSS</span></div>
-        </div>
-        <div class="project-links">
-          <a href="https://apex-arena-pi.vercel.app" target="_blank" rel="noopener">Live demo →</a>
-          <a href="https://github.com/safa-kaware/apex-arena" target="_blank" rel="noopener">GitHub →</a>
-        </div>
-      </div>
-
-      <div class="project-card reveal">
-        <div>
-          <div class="project-top"><h3>Li-Fi Using Arduino</h3><span class="project-cat">Wireless Visible Light Communication</span></div>
-          <p class="desc">A hardware prototype that transmits text over light. Custom encoders turn digital commands into high-speed LED flashes, decoded on the other end by a photodiode array.</p>
-          <div class="project-meta">LED-based high-frequency pulse encoding</div>
-          <div class="tag-row"><span class="tag">Arduino</span><span class="tag">C/C++</span><span class="tag">Photodiode</span><span class="tag">Serial Comm</span></div>
-        </div>
-        <div class="project-links">
-          <a href="https://li-fi-using-arduino.vercel.app/" target="_blank" rel="noopener">Live demo →</a>
-          <a href="https://github.com/safa-kaware/Li-fi-using-Arduino" target="_blank" rel="noopener">GitHub →</a>
-        </div>
-      </div>
-
-      <div class="project-card reveal">
-        <div>
-          <div class="project-top"><h3>Volunteer Registration System</h3><span class="project-cat">NGO Volunteer Ecosystem</span></div>
-          <p class="desc">An onboarding and admin hub built for NayePankh, a community NGO — verification pathways, checklist tracking, and a chatbot that answers common onboarding questions.</p>
-          <div class="project-meta">Automated onboarding workflow</div>
-          <div class="tag-row"><span class="tag">React.js</span><span class="tag">Firebase Firestore</span><span class="tag">AI Chatbot</span><span class="tag">Admin Dashboard</span></div>
-        </div>
-        <div class="project-links">
-          <a href="https://volunteer-registration-system-for-n.vercel.app/" target="_blank" rel="noopener">Live demo →</a>
-          <a href="https://github.com/safa-kaware/volunteer-registration-system-for-nayepankh" target="_blank" rel="noopener">GitHub →</a>
-        </div>
-      </div>
-
-    </div>
+    <div class="project-list" id="projectList"><!-- rendered from site data --></div>
   </section>
 
   <!-- LEARNING -->
@@ -298,22 +200,7 @@
       <span class="eyebrow">Continuing Education</span>
       <h2>Still adding to my toolkit.</h2>
     </div>
-    <div class="train-list">
-      <div class="train-item reveal">
-        <div class="when">Jul 2025 – Oct 2025</div>
-        <div>
-          <h3>Full Stack Java Programming</h3>
-          <p>Seed InfoTech Ltd, Pune — backend architecture, OOP in Java, and API design.</p>
-        </div>
-      </div>
-      <div class="train-item reveal">
-        <div class="when">Jan 2026 – Feb 2026</div>
-        <div>
-          <h3>Database Management Systems</h3>
-          <p>Seed InfoTech Ltd, Pune — SQL, normalization, schema optimization, and NoSQL with MongoDB.</p>
-        </div>
-      </div>
-    </div>
+    <div class="train-list" id="trainList"><!-- rendered from site data --></div>
   </section>
 
   <!-- CERTIFICATES -->
@@ -323,54 +210,7 @@
       <h2>Proof of the work.</h2>
     </div>
 
-    <div class="cert-group">
-      <h3 class="cert-group-title reveal">Training Certificates</h3>
-      <div class="cert-grid">
-        <div class="cert-card reveal">
-          <div class="cert-icon">
-            <svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><circle cx="12" cy="8" r="5" stroke="#7B3B4E" stroke-width="1.6"/><path d="M8.5 12.5L7 21l5-2.5L17 21l-1.5-8.5" stroke="#7B3B4E" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
-          </div>
-          <h4>Full Stack Java Programming</h4>
-          <p class="cert-meta">Seed InfoTech Ltd, Pune · Jul 2025 – Oct 2025</p>
-          <!-- Replace the href below with your certificate file, e.g. certificates/java-training.pdf -->
-          <a class="cert-link" href="certificates/full stack java course.jpg" target="_blank" rel="noopener">
-            View certificate
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M7 17L17 7"/><path d="M8 7h9v9"/></svg>
-          </a>
-        </div>
-
-        <div class="cert-card reveal">
-          <div class="cert-icon">
-            <svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><circle cx="12" cy="8" r="5" stroke="#7B3B4E" stroke-width="1.6"/><path d="M8.5 12.5L7 21l5-2.5L17 21l-1.5-8.5" stroke="#7B3B4E" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
-          </div>
-          <h4>Database Management Systems</h4>
-          <p class="cert-meta">Seed InfoTech Ltd, Pune · Jan 2026 – Feb 2026</p>
-          <!-- Replace the href below with your certificate file, e.g. certificates/dbms-training.pdf -->
-          <a class="cert-link" href="certificates/Kaware Safa Salim Firdous_DBMS_Certificate (1).pdf" target="_blank" rel="noopener">
-            View certificate
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M7 17L17 7"/><path d="M8 7h9v9"/></svg>
-          </a>
-        </div>
-      </div>
-    </div>
-
-    <div class="cert-group">
-      <h3 class="cert-group-title reveal">Course Certificates</h3>
-      <div class="cert-grid">
-        <div class="cert-card cert-card-placeholder reveal">
-          <div class="cert-icon">
-            <svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><rect x="3" y="4" width="18" height="14" rx="2" stroke="#33503F" stroke-width="1.6"/><path d="M3 9h18" stroke="#33503F" stroke-width="1.6"/></svg>
-          </div>
-          <h4>Add a course certificate</h4>
-          <p class="cert-meta">e.g. Coursera, Google, freeCodeCamp — name, provider, and date go here.</p>
-          <!-- Duplicate this card for each course certificate, then set the href to the file -->
-          <a class="cert-link" href="certificates/your-course-certificate.pdf" target="_blank" rel="noopener">
-            View certificate
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M7 17L17 7"/><path d="M8 7h9v9"/></svg>
-          </a>
-        </div>
-      </div>
-    </div>
+    <div id="certGroups"><!-- rendered from site data --></div>
   </section>
 
   <!-- CONTACT -->
@@ -440,6 +280,201 @@
   </div>
 </footer>
 
+<!--
+  SITE DATA — everything below is what powers the Work, Skills, Learning, and
+  Certificates sections above. Don't want to hand-edit this JSON? Open
+  admin.html (kept out of the deployed site) and use the form-based editor
+  instead — it can export a fresh, updated copy of this whole file.
+-->
+<script type="application/json" id="site-data">
+{
+  "projects": [
+    {
+      "id": "proj-dropout",
+      "title": "AI for Silent Dropouts",
+      "category": "Academic Prediction Engine",
+      "description": "A classification model that flags students at risk of quietly dropping out, using academic records, attendance, and behavioral signals to enable early intervention.",
+      "meta": "94.2% prediction accuracy · Random Forest pipeline",
+      "tags": [
+        "Python",
+        "Scikit-Learn",
+        "Pandas",
+        "NumPy",
+        "Matplotlib"
+      ],
+      "demoUrl": "https://ai-for-silent-dropouts.vercel.app/",
+      "githubUrl": "https://github.com/safa-kaware/ai-for-silent-dropouts"
+    },
+    {
+      "id": "proj-pinkapron",
+      "title": "Pink Apron",
+      "category": "Generative AI Culinary Platform",
+      "description": "A social cooking app where a dish idea or a handful of ingredients becomes a structured recipe — measurements, steps, and timing — via custom prompt engineering on Claude.",
+      "meta": "Full-stack · Direct LLM orchestration",
+      "tags": [
+        "React.js",
+        "Node.js",
+        "Express",
+        "MongoDB",
+        "Claude API",
+        "Tailwind CSS"
+      ],
+      "demoUrl": "https://pinkapron.vercel.app",
+      "githubUrl": "https://github.com/safa-kaware/pink-apron"
+    },
+    {
+      "id": "proj-apexarena",
+      "title": "Apex Arena",
+      "category": "Sports Enterprise Automation",
+      "description": "An administration platform for sports clubs and training complexes, with an interactive scheduling matrix and conflict-resolution logic for shared resources.",
+      "meta": "Multi-resource scheduler · Real-time dashboards",
+      "tags": [
+        "React.js",
+        "Node.js",
+        "Firebase",
+        "MySQL",
+        "Tailwind CSS"
+      ],
+      "demoUrl": "https://apex-arena-pi.vercel.app",
+      "githubUrl": "https://github.com/safa-kaware/apex-arena"
+    },
+    {
+      "id": "proj-lifi",
+      "title": "Li-Fi Using Arduino",
+      "category": "Wireless Visible Light Communication",
+      "description": "A hardware prototype that transmits text over light. Custom encoders turn digital commands into high-speed LED flashes, decoded on the other end by a photodiode array.",
+      "meta": "LED-based high-frequency pulse encoding",
+      "tags": [
+        "Arduino",
+        "C/C++",
+        "Photodiode",
+        "Serial Comm"
+      ],
+      "demoUrl": "https://li-fi-using-arduino.vercel.app/",
+      "githubUrl": "https://github.com/safa-kaware/Li-fi-using-Arduino"
+    },
+    {
+      "id": "proj-volunteer",
+      "title": "Volunteer Registration System",
+      "category": "NGO Volunteer Ecosystem",
+      "description": "An onboarding and admin hub built for NayePankh, a community NGO — verification pathways, checklist tracking, and a chatbot that answers common onboarding questions.",
+      "meta": "Automated onboarding workflow",
+      "tags": [
+        "React.js",
+        "Firebase Firestore",
+        "AI Chatbot",
+        "Admin Dashboard"
+      ],
+      "demoUrl": "https://volunteer-registration-system-for-n.vercel.app/",
+      "githubUrl": "https://github.com/safa-kaware/volunteer-registration-system-for-nayepankh"
+    },
+    {
+      "id": "proj-mnvsq8z",
+      "title": "Ai-document-Assistant",
+      "category": "Retrieval-Augmented Generation",
+      "description": "A full-stack Retrieval-Augmented Generation application that lets users upload documents (PDFs) and ask natural-language questions about their content. The system extracts and chunks document text, generates embeddings locally, stores them in a vector database, and retrieves relevant context to generate accurate, source-cited answers — reducing hallucination compared to a standalone LLM.",
+      "meta": "End-to-end RAG pipeline: upload → chunk → embed → retrieve → generate",
+      "tags": [
+        "React",
+        "Vite",
+        "Tailwind CSS · FastAPI",
+        "Python · ChromaDB (vector search) · Sentence-Transformers (local embeddings) · Groq API (LLM inference) · Deployed on Vercel (frontend)",
+        "Render (backend)",
+        "Supabase (storage/DB)"
+      ],
+      "demoUrl": "https://ai-document-assist-eight.vercel.app/",
+      "githubUrl": "https://github.com/safa-kaware/ai-document-assist"
+    }
+  ],
+  "skills": [
+    {
+      "id": "skill-lang",
+      "group": "Languages",
+      "chips": [
+        "Python",
+        "Java",
+        "C",
+        "PHP",
+        "JavaScript",
+        "TypeScript",
+        "HTML5",
+        "CSS"
+      ]
+    },
+    {
+      "id": "skill-aiml",
+      "group": "AI & ML",
+      "chips": [
+        "NumPy",
+        "Pandas",
+        "Scikit-Learn",
+        "Matplotlib",
+        "TensorFlow"
+      ]
+    },
+    {
+      "id": "skill-data",
+      "group": "Data",
+      "chips": [
+        "MySQL",
+        "MongoDB",
+        "SQLite",
+        "Firebase Firestore"
+      ]
+    },
+    {
+      "id": "skill-tools",
+      "group": "Tools",
+      "chips": [
+        "Git & GitHub",
+        "VS Code",
+        "Colab",
+        "Vercel",
+        "Canva"
+      ]
+    }
+  ],
+  "learning": [
+    {
+      "id": "learn-java",
+      "when": "Jul 2025 – Oct 2025",
+      "title": "Full Stack Java Programming",
+      "description": "Seed InfoTech Ltd, Pune — backend architecture, OOP in Java, and API design."
+    },
+    {
+      "id": "learn-dbms",
+      "when": "Jan 2026 – Feb 2026",
+      "title": "Database Management Systems",
+      "description": "Seed InfoTech Ltd, Pune — SQL, normalization, schema optimization, and NoSQL with MongoDB."
+    }
+  ],
+  "certificateGroups": [
+    {
+      "id": "certgrp-training",
+      "groupTitle": "Training Certificates",
+      "items": [
+        {
+          "id": "cert-java",
+          "title": "Full Stack Java Programming",
+          "meta": "Seed InfoTech Ltd, Pune · Jul 2025 – Oct 2025",
+          "href": "certificates/full-stack-java-course.jpg"
+        },
+        {
+          "id": "cert-dbms",
+          "title": "Database Management Systems",
+          "meta": "Seed InfoTech Ltd, Pune · Jan 2026 – Feb 2026",
+          "href": "certificates/dbms-certificate.pdf"
+        }
+      ]
+    },
+    {
+      "id": "certgrp-course",
+      "groupTitle": "Course Certificates",
+      "items": []
+    }
+  ]
+}
+</script>
 <script src="script.js"></script>
 
 </body>
